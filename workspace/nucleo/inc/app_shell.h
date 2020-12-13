@@ -27,11 +27,14 @@ typedef const struct
 } SHELL_CMD_T;
 
 
-void ProcessCommandline(char Buffer[]);
+uint32_t ProcessCommandline(char Buffer[]);
 uint8_t ParseArgv(char *cmdline, char *argv[]);
 void RemoveDeleteChar(char Buffer[]);
 
 
+void boardInfo();
 void ShellHelp (int, char**);
+void ttlOut (int, char**);
+void reset();
 
 #endif /* APP_SHELL_H_ */

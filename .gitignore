@@ -1,0 +1,10 @@
+**/.metadata
+**/Debug
+**/Release
+*.o
+*.bin
+*.log
+*.xml
+*.cfg
+# Mac
+**/.DS_Store

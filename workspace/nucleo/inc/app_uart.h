@@ -27,4 +27,8 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart);
 #define BACKSPACE_CHAR	0x08
 #define DELETE_CHAR		0x7F
 
+static char    tx_backspace[1] = {'\b'};
+static uint8_t tx_endOfText    = 3;
+static uint8_t tx_leftArrowKey = 27;
+
 #endif /* APP_UART_H_ */
