@@ -13,11 +13,16 @@ SHELL_CMD_T ShellCmd[] =
 		{"help", 0, 0, ShellHelp, "Display this help message", "help"},
 		{"boardInfo", 0, 0, boardInfo, "Print board info", "boardInfo"},
 		{"reset", 0, 0, reset, "Software reset Nucleo board", "reset"},
-		{"ttlOut", 1, 1, ttlOut, "TTL Command", "TTL <option>"}
+		{"uptime", 0, 0, uptime, "Board total ON time", "uptime"},
+		{"ttlOutEnable", 0, 1, ttlOutEnable, "Enable/Diable TTL digital ouput", "ttlOutEnable <1/0>"},
+
+		{"setPrescale", 0, 1, setPrescale, "Prescale is used to divide TIM", "setPrescale <value>"},
+		{"setPeriod", 0, 1, setPeriod, "setPeriod for Event Trigger", "setPeriod <value>"},
+		//{"ttlOut", 1, 1, ttlOut, "TTL Command", "TTL <option>"}
 
 };
 
-static const char HELP_FORMAT_SHELL[] = "\n\r%14s  %-28s  %-20s\n\r";
+static const char HELP_FORMAT_SHELL[] = "%14s  %-35s  %-20s\n\r";
 const uint8_t NumShellCmd = sizeof(ShellCmd)/sizeof(SHELL_CMD_T);
 
 /* --------------------------------------------------------------------------------------------
@@ -38,7 +43,8 @@ void ShellPrintf(UART_HandleTypeDef *hUart, const char *fmt, ...)
 
 		//HAL_UART_Transmit(hUart, (uint8_t*)gdUsrCmdIn.cmdUsrPrompt, strlen(gdUsrCmdIn.cmdUsrPrompt), 0xFFFF );
 		HAL_UART_Transmit(hUart, (uint8_t*)buffer,strlen(buffer), 0xFFFF );
-		//HAL_UART_Transmit(hUart, (uint8_t*)gdUsrCmdIn.cmdUsrPrompt, strlen(gdUsrCmdIn.cmdUsrPrompt), 0xFFFF );
+		//HAL_UART_Transmit(hUart, (uint8_t*)gdUsrCmdIn.cmdPrompt, strlen(gdUsrCmdIn.cmdPrompt), 0xFFFF );
+
 	}
 }
 
@@ -54,6 +60,7 @@ void ShellHelp (int argc, char **argv)
 	(void)argv;
 
 	ShellPrintf(&uartIf, gdUsrCmdIn.cmdPrompt);
+	ShellPrintf(&uartIf, "\n\r");
 	ShellPrintf(&uartIf, HELP_FORMAT_SHELL, "COMMAND", "DESCRIPTION", "SYNTAX");
 	for(indx = 0; indx < NumShellCmd; indx++)
 	{
@@ -63,6 +70,58 @@ void ShellHelp (int argc, char **argv)
 				ShellCmd[indx].syntax);
 	}
 	ShellPrintf(&uartIf, gdUsrCmdIn.cmdPrompt);
+}
+
+/* --------------------------------------------------------------------------------------------
+ * @description		Print board info
+ * @param[in]		Number of argument (argc) and argument vector (argv)
+ * @return			None
+ */
+void boardInfo()
+{
+
+
+	ShellPrintf(&uartIf, "\n\r--------------------------------------------\n\r");
+	ShellPrintf(&uartIf, "-                                          -\n\r");
+	ShellPrintf(&uartIf, "-        STM32F103RB Nucleo Board          -\n\r");
+	ShellPrintf(&uartIf, "-                                          -\n\r");
+	ShellPrintf(&uartIf, "- www.st.com/stm32nucleo                   -\n\r");
+	ShellPrintf(&uartIf, "-                                          -\n\r");
+	ShellPrintf(&uartIf, "- Flash        : 128 Kbytes                -\n\r");
+	ShellPrintf(&uartIf, "- SRAM         : 20  Kbytes                -\n\r");
+	ShellPrintf(&uartIf, "- Timers                                   -\n\r");
+	ShellPrintf(&uartIf, "-     General-purpose  : 3                 -\n\r");
+	ShellPrintf(&uartIf, "-     Advanced-control : 1                 -\n\r");
+	ShellPrintf(&uartIf, "- Communication                            -\n\r");
+	ShellPrintf(&uartIf, "-     SPI       : 2                        -\n\r");
+	ShellPrintf(&uartIf, "-     I2C       : 2                        -\n\r");
+	ShellPrintf(&uartIf, "-     USART     : 3                        -\n\r");
+	ShellPrintf(&uartIf, "-     USB       : 1                        -\n\r");
+	ShellPrintf(&uartIf, "-     CAN       : 1                        -\n\r");
+	ShellPrintf(&uartIf, "- GPIOs         : 51                       -\n\r");
+	ShellPrintf(&uartIf, "- 12-bit Synch ADC  : 2 (16 Channels)      -\n\r");
+	ShellPrintf(&uartIf, "- CPU Frequency     : 72 MHz               -\n\r");
+	ShellPrintf(&uartIf, "- Operating Voltage : 2.0 to 3.6V          -\n\r");
+	ShellPrintf(&uartIf, "-                                          -\n\r");
+	ShellPrintf(&uartIf, "-                                          -\n\r");
+	ShellPrintf(&uartIf, "-                   by Team2130 WhisIQey   -\n\r");
+	ShellPrintf(&uartIf, "--------------------------------------------\n\r");
+
+	ShellPrintf(&uartIf, gdUsrCmdIn.cmdPrompt);
+}
+
+void reset()
+{
+//	RTC_TimeTypeDef sTimeSet;
+//	sTimeSet.Hours   = 0;
+//	sTimeSet.Minutes = 0;
+//	sTimeSet.Seconds = 0;
+//	RTC_SetTime(&rtc_h, &sTimeSet);
+
+	//TODO
+	//Clean up all the app's and setting everything to default. Best to event notify.
+
+	NVIC_SystemReset();
 }
 
 /* --------------------------------------------------------------------------------------------
@@ -88,48 +147,89 @@ void ttlOut (int argc, char **argv)
 	ShellPrintf(&uartIf, gdUsrCmdIn.cmdPrompt);
 }
 
-void reset()
-{
-	NVIC_SystemReset();
-}
 
 /* --------------------------------------------------------------------------------------------
- * @description		Print board info
+ * @description		Total time since board is powered up
  * @param[in]		Number of argument (argc) and argument vector (argv)
  * @return			None
  */
-void boardInfo()
+void uptime(int argc, char **argv)
 {
-
-
-	ShellPrintf(&uartIf, "\n\r-------------------------------------------\n\r");
-	ShellPrintf(&uartIf, "-                                         -\n\r");
-	ShellPrintf(&uartIf, "-        STM32F103RB Nucleo Board         -\n\r");
-	ShellPrintf(&uartIf, "-                                         -\n\r");
-	ShellPrintf(&uartIf, "- www.st.com/stm32nucleo                  -\n\r");
-	ShellPrintf(&uartIf, "-                                         -\n\r");
-	ShellPrintf(&uartIf, "- Flash        :128 Kbytes                -\n\r");
-	ShellPrintf(&uartIf, "- SRAM         :20  Kbytes                -\n\r");
-	ShellPrintf(&uartIf, "- Timers                                  -\n\r");
-	ShellPrintf(&uartIf, "-     General-purpose  :3                 -\n\r");
-	ShellPrintf(&uartIf, "-     Advanced-control :1                 -\n\r");
-	ShellPrintf(&uartIf, "- Communication                           -\n\r");
-	ShellPrintf(&uartIf, "-     SPI       :2                        -\n\r");
-	ShellPrintf(&uartIf, "-     I2C       :2                        -\n\r");
-	ShellPrintf(&uartIf, "-     USART     :3                        -\n\r");
-	ShellPrintf(&uartIf, "-     USB       :1                        -\n\r");
-	ShellPrintf(&uartIf, "-     CAN       :1                        -\n\r");
-	ShellPrintf(&uartIf, "- GPIOs         :51                       -\n\r");
-	ShellPrintf(&uartIf, "- 12-bit Synch ADC  :2 (16 Channels)      -\n\r");
-	ShellPrintf(&uartIf, "- CPU Frequency     :72 MHz               -\n\r");
-	ShellPrintf(&uartIf, "- Operating Voltage :2.0 to 3.6V          -\n\r");
-	ShellPrintf(&uartIf, "-                                         -\n\r");
-	ShellPrintf(&uartIf, "-                                         -\n\r");
-	ShellPrintf(&uartIf, "-                   by Team2130 WhisIQey  -\n\r");
-	ShellPrintf(&uartIf, "-------------------------------------------\n\r");
-
+	RTC_GetTime(&rtc_h, uptimeStamp);
+	ShellPrintf(&uartIf, "\n   Nucleo Board has been powered up for: %s", uptimeStamp);
 	ShellPrintf(&uartIf, gdUsrCmdIn.cmdPrompt);
 }
+
+/* --------------------------------------------------------------------------------------------
+ * @description		Enable/Diable digital ouput
+ * @param[in]		Number of argument (argc) and argument vector (argv)
+ * @return			None
+ */
+void ttlOutEnable(int argc, char **argv)
+{
+	if(argc == 1)
+	{
+		ShellPrintf(&uartIf, "\n\r   ttlOutEnable: %d", gbTtlOutEnable);
+	}
+	else
+	{
+		gbTtlOutEnable = strtol(argv[1], NULL, 10);
+	}
+	ShellPrintf(&uartIf, gdUsrCmdIn.cmdPrompt);
+}
+
+/* --------------------------------------------------------------------------------------------
+ * @description		setPrescale
+ * @param[in]		Number of argument (argc) and argument vector (argv)
+ * @return			None
+ */
+void setPrescale(int argc, char **argv)
+{
+	if(argc == 1)
+	{
+		ShellPrintf(&uartIf, "\n\r   gbPrescaleTim: %d", gbPrescaleTim);
+	}
+	else
+	{
+		HAL_TIM_Base_DeInit(&PeriodicTim);
+
+		gbPrescaleTim = (uint32_t)strtoul(argv[1], NULL, 10);
+		TIM2_Init(&PeriodicTim, gbPrescaleTim, gbPeriodTim);
+
+
+		HAL_TIM_Base_Start_IT(&PeriodicTim);
+	}
+	ShellPrintf(&uartIf, gdUsrCmdIn.cmdPrompt);
+}
+
+
+
+/* --------------------------------------------------------------------------------------------
+ * @description		setPeriod
+ * @param[in]		Number of argument (argc) and argument vector (argv)
+ * @return			None
+ */
+void setPeriod(int argc, char **argv)
+{
+	if(argc == 1)
+	{
+		ShellPrintf(&uartIf, "\n\r   gbPeriodTim: %d", gbPeriodTim);
+	}
+	else
+	{
+		HAL_TIM_Base_DeInit(&PeriodicTim);
+
+
+		gbPeriodTim = (uint32_t)strtoul(argv[1], NULL, 10);
+		TIM2_Init(&PeriodicTim, gbPrescaleTim, gbPeriodTim);
+
+		HAL_TIM_Base_Start_IT(&PeriodicTim);
+	}
+	ShellPrintf(&uartIf, gdUsrCmdIn.cmdPrompt);
+}
+
+
+
 
 /* --------------------------------------------------------------------------------------------
  * @description		Process command line input from user

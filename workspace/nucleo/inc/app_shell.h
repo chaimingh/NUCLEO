@@ -32,9 +32,16 @@ uint8_t ParseArgv(char *cmdline, char *argv[]);
 void RemoveDeleteChar(char Buffer[]);
 
 
-void boardInfo();
 void ShellHelp (int, char**);
-void ttlOut (int, char**);
+void boardInfo();
 void reset();
+void ttlOut (int, char**);
+void uptime(int, char**);
+void ttlOutEnable(int, char**);
+
+void setPrescale(int, char**);
+void setPeriod(int, char**);
+
+
 
 #endif /* APP_SHELL_H_ */

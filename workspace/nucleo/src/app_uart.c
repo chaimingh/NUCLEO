@@ -97,7 +97,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 			{
 				HAL_UART_Transmit(&uartIf, gdUsrCmdIn.cmdPrompt, strlen(gdUsrCmdIn.cmdPrompt), UART_TIMEOUT);
 			}
-			memset(gdUsrCmdIn.buff, 0, strlen(gdUsrCmdIn.buff));
+			//sizeof() for entire allocated array size. strlen() is only upto first "\0" char.
+			memset(gdUsrCmdIn.buff, '\0', sizeof(gdUsrCmdIn.buff));
 		}
 		//Backspace to delete
 		else if((rxChar[0] == BACKSPACE_CHAR) && (gdUsrCmdIn.buffIndex > 0))

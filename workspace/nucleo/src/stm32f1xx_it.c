@@ -16,6 +16,8 @@
 #endif
 #include "stm32f1xx_it.h"
 
+#include "main.h"
+
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
@@ -41,4 +43,7 @@ void SysTick_Handler(void)
 #endif
 }
 
-
+void TIM2_IRQHandler(void)
+{
+	HAL_TIM_IRQHandler(&PeriodicTim);
+}
